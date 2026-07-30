@@ -1,0 +1,26 @@
+[project]
+name = "mojo-num2words"
+version = "0.1.0"
+description = "English number-to-words conversion accelerated by Mojo"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Lee Penkman", email = "leepenkman@gmail.com" }]
+keywords = ["mojo", "num2words", "numbers", "localization"]
+dependencies = ["numpy"]
+
+[project.optional-dependencies]
+dev = ["pytest", "num2words==0.5.14"]
+
+[project.urls]
+Homepage = "https://github.com/lee101/mojo-num2words"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "python" }
+
+[tool.setuptools.packages.find]
+where = ["python"]
