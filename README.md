@@ -78,28 +78,30 @@ This prints `twenty twenty-six`.
 
 ## Performance
 
-Measured on 2026-07-30 with an Intel Xeon E5-2697 v4 at 2.30 GHz, 72 logical
+Measured on 2026-08-24 with an Intel Xeon E5-2697 v4 at 2.30 GHz, 72 logical
 CPUs, and Linux 6.8.0-136-generic. Times are the best of three warm runs.
 Every benchmark first asserts exact output equality with `num2words` 0.5.14.
 
 | case | mojo-num2words | num2words 0.5.14 | speedup |
 | --- | ---: | ---: | ---: |
-| cardinal, 100k sequential | 285.1 ms | 9767.4 ms | 34.26x |
-| cardinal, 100k random <= 10^15 | 356.3 ms | 38761.8 ms | 108.80x |
-| ordinal, 100k sequential | 263.4 ms | 13662.1 ms | 51.87x |
-| ordinal_num, 100k sequential | 212.1 ms | 10037.2 ms | 47.31x |
-| year, 100k four-digit | 171.5 ms | 6051.8 ms | 35.29x |
-| cardinal, 10k scalar calls | 397.0 ms | 2809.5 ms | 7.08x |
+| cardinal, 100k sequential | 152.6 ms | 7555.0 ms | 49.50x |
+| cardinal, 100k random <= 10^15 | 243.0 ms | 25622.4 ms | 105.43x |
+| ordinal, 100k sequential | 165.9 ms | 7806.7 ms | 47.06x |
+| ordinal_num, 100k sequential | 130.8 ms | 7846.1 ms | 59.98x |
+| year, 100k four-digit | 168.6 ms | 4354.0 ms | 25.83x |
+| cardinal, 10k scalar calls | 252.2 ms | 2613.5 ms | 10.36x |
 
 Run `pixi run bench` to reproduce the Markdown table. The large batch gains
 come from replacing recursive Python object and string construction with one
 tight native pass. Scalar calls still pay NumPy and ctypes setup on every
 value, so batching remains considerably faster.
 
-No SIMD, parallel, or GPU path is used. The measured batch cases are 34x to
-109x faster than upstream. Conversion is branch-heavy, variable-length byte
-emission rather than a homogeneous numeric loop, so this implementation uses a
-scalar CPU kernel.
+No SIMD, parallel, or GPU path is used. Every measured case is already more
+than 10x faster than upstream, so none is an optimization target under the 5x
+cutoff. Conversion is branch-heavy, variable-length byte emission rather than
+a homogeneous numeric loop. It performs no floating-point arithmetic and does
+not meet the roughly 2-flops-per-byte threshold needed to justify GPU transfer
+and launch overhead, so the implementation remains a scalar CPU kernel.
 
 ## How it works
 
